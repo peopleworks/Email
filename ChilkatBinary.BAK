@@ -1,0 +1,36 @@
+LOCAL loPdfData
+LOCAL lnSuccess
+LOCAL lcB64
+LOCAL loPdfData2
+
+loPdfData = CreateObject('Chilkat_9_5_0.BinData')
+
+lnSuccess = loPdfData.LoadFile("c:\redpeopleworks\i360doc.pdf")
+IF (lnSuccess <> 1) THEN
+    ? "failed to load PDF file."
+    RELEASE loPdfData
+    CANCEL
+ENDIF
+
+* Encode the PDF to base64
+* Note: to produce base64 on multiple lines (as it would appear in the MIME of an email),
+* pass the string "base64_mime" instead of "base64".
+lcB64 = loPdfData.GetEncoded("base64")
+*? lcB64
+
+STRTOFILE(lcB64, [c:\spooler\admin\encode.txt], .T.)
+
+
+* Decode from base64 PDF.
+loPdfData2 = CreateObject('Chilkat_9_5_0.BinData')
+loPdfData2.AppendEncoded(lcB64,"base64")
+lnSuccess = loPdfData2.WriteFile("c:\redpeopleworks\i360v5.pdf")
+IF (lnSuccess <> 1) THEN
+    ? "failed to write PDF file."
+    RELEASE loPdfData
+    RELEASE loPdfData2
+    CANCEL
+ENDIF
+
+RELEASE loPdfData
+RELEASE loPdfData2
